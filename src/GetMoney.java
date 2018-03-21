@@ -1,7 +1,7 @@
 import java.util.HashMap;
 
-public class GetMoney {
-    private HashMap<String, MoneyInfo> moneyMap = new HashMap<String, MoneyInfo>();
+public class GetMoney implements BudgetRepo {
+    private HashMap<String, MoneyInfo> moneyMap = new HashMap<>();
 
     public GetMoney(){
         moneyMap.put("2018-01", new MoneyInfo(31));
@@ -11,6 +11,6 @@ public class GetMoney {
         if (!moneyMap.containsKey(month)){
             return null;
         }
-        return moneyMap.get(month).money;
+        return moneyMap.getOrDefault(month, new MoneyInfo(0)).money;
     }
 }

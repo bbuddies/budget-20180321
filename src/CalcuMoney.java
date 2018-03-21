@@ -1,8 +1,15 @@
 import java.time.YearMonth;
 
-public class CalcuMonty {
+public class CalcuMoney {
+    private final BudgetRepo budgetRepo;
+
+    public CalcuMoney(BudgetRepo budgetRepo) {
+
+        this.budgetRepo = budgetRepo;
+    }
+
     public double calcuMoney(String start, String end){
-        try {
+//        try {
             Integer result = 0;
 
             Integer startDay = Integer.valueOf(start.substring(8, 10));
@@ -40,15 +47,14 @@ public class CalcuMonty {
             }
             return result;
 
-        }
-        catch (Exception ex){
-            return -1;
-        }
+//        }
+//        catch (Exception ex){
+//            return -1;
+//        }
     }
 
     private Integer getMoneyInMonth(Integer month, Integer year) {
-        GetMoney gm = new GetMoney();
-        return gm.getMoney(getMoneyStr(year, month));
+        return budgetRepo.getMoney(getMoneyStr(year, month));
     }
 
     private String getMoneyStr(Integer year, Integer month) {
@@ -58,8 +64,7 @@ public class CalcuMonty {
     private Integer getMoneyInYear(int startMonth, int endMonth, Integer year) {
         Integer result = 0;
         for (Integer month = startMonth; month <= endMonth; month++){
-            GetMoney gm = new GetMoney();
-            result += gm.getMoney(getMoneyStr(year, month));
+            result += budgetRepo.getMoney(getMoneyStr(year, month));
         }
         return result;
     }
