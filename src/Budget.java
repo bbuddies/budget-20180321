@@ -1,3 +1,5 @@
+import java.time.YearMonth;
+
 public class Budget {
     private String month;
     private int amount;
@@ -13,5 +15,14 @@ public class Budget {
 
     public int getAmount() {
         return amount;
+    }
+
+    Period getPeriod() {
+        YearMonth startMonth = YearMonth.parse(month);
+        return new Period(startMonth.atDay(1), startMonth.atEndOfMonth());
+    }
+
+    int getDayCount() {
+        return getPeriod().getDayCount();
     }
 }

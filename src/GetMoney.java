@@ -1,3 +1,4 @@
+import java.time.YearMonth;
 import java.util.HashMap;
 
 public class GetMoney implements BudgetRepo {
@@ -12,5 +13,10 @@ public class GetMoney implements BudgetRepo {
             return null;
         }
         return moneyMap.getOrDefault(month, new MoneyInfo(0)).money;
+    }
+
+    @Override
+    public Budget getBudget(YearMonth yearMonth) {
+        return new Budget(yearMonth.toString(), getMoney(yearMonth.toString()));
     }
 }

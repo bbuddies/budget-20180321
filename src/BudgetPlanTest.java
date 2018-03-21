@@ -1,5 +1,6 @@
 import org.junit.Test;
 
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -91,8 +92,10 @@ public class BudgetPlanTest {
 
 class BudgetRepoStub implements BudgetRepo {
     private HashMap<String, MoneyInfo> moneyMap = new HashMap<>();
+    private List<Budget> budgets;
 
     public void setBudgets(List<Budget> budgets) {
+        this.budgets = budgets;
         moneyMap.clear();
         budgets.forEach(budget -> moneyMap.put(budget.getMonth(), new MoneyInfo(budget.getAmount())));
     }
@@ -100,5 +103,10 @@ class BudgetRepoStub implements BudgetRepo {
     @Override
     public Integer getMoney(String month) {
         return moneyMap.getOrDefault(month, new MoneyInfo(0)).money;
+    }
+
+    @Override
+    public Budget getBudget(YearMonth yearMonth) {
+        return budgets.stream().filter(budget -> budget.getMonth().equals(yearMonth.toString())).findFirst().orElse(new Budget(yearMonth.toString(), 0));
     }
 }
