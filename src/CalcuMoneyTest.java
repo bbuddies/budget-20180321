@@ -52,9 +52,10 @@ public class CalcuMoneyTest {
         givenBudgetPeriods(
                 new Budget("2017-11", 30),
                 new Budget("2017-12", 31000),
-                new Budget("2018-01", 310)
+                new Budget("2018-01", 310),
+                new Budget("2019-02", 2800)
         );
-        assertEquals(9+31000+20, calcuMoney.calcuMoney("2017-11-22", "2018-01-02"), 0.01);
+        assertEquals(9+31000+310+200, calcuMoney.calcuMoney("2017-11-22", "2019-02-02"), 0.01);
     }
 
     @Test
