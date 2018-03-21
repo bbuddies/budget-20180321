@@ -7,9 +7,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 
-public class CalcuMoneyTest {
+public class BudgetPlanTest {
     private BudgetRepoStub budgetRepo = new BudgetRepoStub();
-    private CalcuMoney calcuMoney = new CalcuMoney(budgetRepo);
+    private BudgetPlan budgetPlan = new BudgetPlan(budgetRepo);
 
     private void givenBudgetPeriods(Budget... budgets) {
         budgetRepo.setBudgets(Arrays.asList(budgets));
@@ -18,13 +18,13 @@ public class CalcuMoneyTest {
     @Test
     public void no_budget() {
         givenBudgetPeriods();
-        assertEquals(0, calcuMoney.calcuMoney("2018-01-03", "2018-03-04"), 0.01);
+        assertEquals(0, budgetPlan.query("2018-01-03", "2018-03-04"), 0.01);
     }
 
     @Test
     public void query_within_one_budget() throws Exception {
         givenBudgetPeriods(new Budget("2018-01", 310));
-        assertEquals(20, calcuMoney.calcuMoney("2018-01-03", "2018-01-04"), 0.01);
+        assertEquals(20, budgetPlan.query("2018-01-03", "2018-01-04"), 0.01);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class CalcuMoneyTest {
                 new Budget("2018-01", 310),
                 new Budget("2018-02", 28)
         );
-        assertEquals(150 + 6, calcuMoney.calcuMoney("2018-01-17", "2018-02-06"), 0.01);
+        assertEquals(150 + 6, budgetPlan.query("2018-01-17", "2018-02-06"), 0.01);
     }
 
     @Test
@@ -44,19 +44,37 @@ public class CalcuMoneyTest {
                 new Budget("2018-03", 3100),
                 new Budget("2018-04", 30000)
         );
-        assertEquals(100 + 28 + 3100 + 2000, calcuMoney.calcuMoney("2018-01-22", "2018-04-02"), 0.01);
+        assertEquals(100 + 28 + 3100 + 2000, budgetPlan.query("2018-01-22", "2018-04-02"), 0.01);
+    }
+
+    @Test
+    public void query_december() throws Exception {
+        givenBudgetPeriods(
+                new Budget("2017-12", 3100)
+        );
+        assertEquals(1400, budgetPlan.query("2017-12-17", "2017-12-30"), 0.01);
+    }
+
+    @Test
+    public void query_across_year() throws Exception {
+        givenBudgetPeriods(
+                new Budget("2017-12", 3100),
+                new Budget("2018-01", 310),
+                new Budget("2018-02", 28)
+        );
+        assertEquals(1500 + 310 + 6, budgetPlan.query("2017-12-17", "2018-02-06"), 0.01);
     }
 
     @Test
     public void query_start_date_out_of_budgets() throws Exception {
         givenBudgetPeriods(new Budget("2018-02", 28));
-        assertEquals(5, calcuMoney.calcuMoney("2018-01-22", "2018-02-05"), 0.01);
+        assertEquals(5, budgetPlan.query("2018-01-22", "2018-02-05"), 0.01);
     }
 
     @Test
     public void query_end_date_out_of_budgets() throws Exception {
         givenBudgetPeriods(new Budget("2018-02", 28));
-        assertEquals(9, calcuMoney.calcuMoney("2018-02-20", "2018-03-15"), 0.01);
+        assertEquals(9, budgetPlan.query("2018-02-20", "2018-03-15"), 0.01);
     }
 
     @Test
@@ -66,7 +84,7 @@ public class CalcuMoneyTest {
                 new Budget("2018-02", 28),
                 new Budget("2018-04", 30000)
         );
-        assertEquals(100 + 28 + 2000, calcuMoney.calcuMoney("2018-01-22", "2018-04-02"), 0.01);
+        assertEquals(100 + 28 + 2000, budgetPlan.query("2018-01-22", "2018-04-02"), 0.01);
     }
 }
 
