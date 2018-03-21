@@ -46,7 +46,6 @@ public class CalcuMoney {
                 if(!year.equals(startYear) && !year.equals(endYear)){
                     result += getMoneyInYear(1, 12, year);
                 }
-                return result;
             }
             return result;
 

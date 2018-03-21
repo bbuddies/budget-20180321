@@ -48,6 +48,16 @@ public class CalcuMoneyTest {
     }
 
     @Test
+    public void query_across_years() throws Exception {
+        givenBudgetPeriods(
+                new Budget("2017-11", 30),
+                new Budget("2017-12", 31000),
+                new Budget("2018-01", 310)
+        );
+        assertEquals(9+31000+20, calcuMoney.calcuMoney("2017-11-22", "2018-01-02"), 0.01);
+    }
+
+    @Test
     public void query_start_date_out_of_budgets() throws Exception {
         givenBudgetPeriods(new Budget("2018-02", 28));
         assertEquals(5, calcuMoney.calcuMoney("2018-01-22", "2018-02-05"), 0.01);
