@@ -33,7 +33,7 @@ public class CalcuMoneyTest {
                 new Budget("2018-01", 310),
                 new Budget("2018-02", 28)
         );
-        assertEquals(150+6, calcuMoney.calcuMoney("2018-01-17", "2018-02-06"), 0.01);
+        assertEquals(150 + 6, calcuMoney.calcuMoney("2018-01-17", "2018-02-06"), 0.01);
     }
 
     @Test
@@ -44,10 +44,30 @@ public class CalcuMoneyTest {
                 new Budget("2018-03", 3100),
                 new Budget("2018-04", 30000)
         );
-        assertEquals(100+28+3100+2000, calcuMoney.calcuMoney("2018-01-22", "2018-04-02"), 0.01);
+        assertEquals(100 + 28 + 3100 + 2000, calcuMoney.calcuMoney("2018-01-22", "2018-04-02"), 0.01);
     }
 
+    @Test
+    public void query_start_date_out_of_budgets() throws Exception {
+        givenBudgetPeriods(new Budget("2018-02", 28));
+        assertEquals(5, calcuMoney.calcuMoney("2018-01-22", "2018-02-05"), 0.01);
+    }
 
+    @Test
+    public void query_end_date_out_of_budgets() throws Exception {
+        givenBudgetPeriods(new Budget("2018-02", 28));
+        assertEquals(9, calcuMoney.calcuMoney("2018-02-20", "2018-03-15"), 0.01);
+    }
+
+    @Test
+    public void default_amount_of_missing_budgets_is_0() throws Exception {
+        givenBudgetPeriods(
+                new Budget("2018-01", 310),
+                new Budget("2018-02", 28),
+                new Budget("2018-04", 30000)
+        );
+        assertEquals(100 + 28 + 2000, calcuMoney.calcuMoney("2018-01-22", "2018-04-02"), 0.01);
+    }
 }
 
 class BudgetRepoStub implements BudgetRepo {
