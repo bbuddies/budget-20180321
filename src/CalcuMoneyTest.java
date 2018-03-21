@@ -16,10 +16,37 @@ public class CalcuMoneyTest {
     }
 
     @Test
-    public void no_budget(){
+    public void no_budget() {
         givenBudgetPeriods();
         assertEquals(0, calcuMoney.calcuMoney("2018-01-03", "2018-03-04"), 0.01);
     }
+
+    @Test
+    public void query_within_one_budget() throws Exception {
+        givenBudgetPeriods(new Budget("2018-01", 310));
+        assertEquals(20, calcuMoney.calcuMoney("2018-01-03", "2018-01-04"), 0.01);
+    }
+
+    @Test
+    public void query_across_two_budgets() throws Exception {
+        givenBudgetPeriods(
+                new Budget("2018-01", 310),
+                new Budget("2018-02", 28)
+        );
+        assertEquals(150+6, calcuMoney.calcuMoney("2018-01-17", "2018-02-06"), 0.01);
+    }
+
+    @Test
+    public void query_across_multiple_budgets() throws Exception {
+        givenBudgetPeriods(
+                new Budget("2018-01", 310),
+                new Budget("2018-02", 28),
+                new Budget("2018-03", 3100),
+                new Budget("2018-04", 30000)
+        );
+        assertEquals(100+28+3100+2000, calcuMoney.calcuMoney("2018-01-22", "2018-04-02"), 0.01);
+    }
+
 
 }
 

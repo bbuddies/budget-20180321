@@ -23,8 +23,11 @@ public class CalcuMoney {
 
             for (Integer year = startYear; year <= endYear; year++){
                 if (startYear.equals(endYear)){
-                    result += getMoneyInYear(startMonth + 1, endMonth - 1, year);
                     YearMonth ym = YearMonth.of(year, startMonth);
+                    if (startMonth.equals(endMonth)){
+                        return getMoneyInMonth(startMonth, year)*(endDay - startDay + 1)/ym.lengthOfMonth();
+                    }
+                    result += getMoneyInYear(startMonth + 1, endMonth - 1, year);
                     result += getMoneyInMonth(startMonth, year)*(ym.lengthOfMonth() - startDay + 1)/ym.lengthOfMonth();
                     ym = YearMonth.of(year, endMonth);
                     result += getMoneyInMonth(endMonth, year)*endDay/ym.lengthOfMonth();
