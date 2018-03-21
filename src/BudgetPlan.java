@@ -17,33 +17,60 @@ public class BudgetPlan {
 
     private double query(Period period) {
         Integer result = 0;
+        if (period.getStartDate().getYear() == period.getEndDate().getYear()) {
+            YearMonth ym = YearMonth.of(period.getStartDate().getYear(), period.getStartDate().getMonthValue());
+            if (period.getStartDate().getMonthValue() == period.getEndDate().getMonthValue())
+                return getMoneyInMonth(period.getStartDate().getMonthValue(), period.getStartDate().getYear()) * getDayCountBetween(period.getStartDate(), period.getEndDate()) / ym.lengthOfMonth();
+            result += getMoneyInYear(period.getStartDate().getMonthValue() + 1, period.getEndDate().getMonthValue() - 1, period.getStartDate().getYear());
+            result += getMoneyInMonth(period.getStartDate().getMonthValue(), period.getStartDate().getYear()) * (ym.lengthOfMonth() - period.getStartDate().getDayOfMonth() + 1) / ym.lengthOfMonth();
+            ym = YearMonth.of(period.getStartDate().getYear(), period.getEndDate().getMonthValue());
+            result += getMoneyInMonth(period.getEndDate().getMonthValue(), period.getStartDate().getYear()) * period.getEndDate().getDayOfMonth() / ym.lengthOfMonth();
+            return result;
+        }
         for (Integer year = period.getStartDate().getYear(); year <= period.getEndDate().getYear(); year++) {
-            if (period.getStartDate().getYear() == period.getEndDate().getYear()) {
-                YearMonth ym = YearMonth.of(year, period.getStartDate().getMonthValue());
-                if (period.getStartDate().getMonthValue() == period.getEndDate().getMonthValue()) {
-                    return getMoneyInMonth(period.getStartDate().getMonthValue(), year) * (period.getEndDate().getDayOfMonth() - period.getStartDate().getDayOfMonth() + 1) / ym.lengthOfMonth();
-                }
-                result += getMoneyInYear(period.getStartDate().getMonthValue() + 1, period.getEndDate().getMonthValue() - 1, year);
-                result += getMoneyInMonth(period.getStartDate().getMonthValue(), year) * (ym.lengthOfMonth() - period.getStartDate().getDayOfMonth() + 1) / ym.lengthOfMonth();
-                ym = YearMonth.of(year, period.getEndDate().getMonthValue());
-                result += getMoneyInMonth(period.getEndDate().getMonthValue(), year) * period.getEndDate().getDayOfMonth() / ym.lengthOfMonth();
-                return result;
-            }
             if (year.equals(period.getStartDate().getYear())) {
-                result += getMoneyInYear(period.getStartDate().getMonthValue() + 1, 12, year);
-                YearMonth ym = YearMonth.of(year, period.getStartDate().getMonthValue());
-                result += getMoneyInMonth(period.getStartDate().getMonthValue(), year) * (ym.lengthOfMonth() - period.getStartDate().getDayOfMonth() + 1) / ym.lengthOfMonth();
+                for (Integer month = period.getStartDate().getMonthValue() + 1; month <= 12; month++) {
+                    YearMonth yearMonth = YearMonth.of(year, month);
+                    result += getMoneyInMonth(yearMonth.getMonthValue(), yearMonth.getYear())
+                            * getOverlappingDayCount(period, toPeriod(yearMonth))
+                            / yearMonth.lengthOfMonth();
+                }
+
+                YearMonth yearMonth = YearMonth.from(period.getStartDate());
+                result += getMoneyInMonth(yearMonth.getMonthValue(), yearMonth.getYear())
+                        * getOverlappingDayCount(period, toPeriod(yearMonth))
+                        / yearMonth.lengthOfMonth();
             }
             if (year.equals(period.getEndDate().getYear())) {
-                result += getMoneyInYear(1, period.getEndDate().getMonthValue() - 1, year);
-                YearMonth ym = YearMonth.of(year, period.getEndDate().getMonthValue());
-                result += getMoneyInMonth(period.getEndDate().getMonthValue(), year) * period.getEndDate().getDayOfMonth() / ym.lengthOfMonth();
+                for (Integer month = 1; month <= period.getEndDate().getMonthValue() - 1; month++) {
+                    YearMonth yearMonth = YearMonth.of(year, month);
+                    result += getMoneyInMonth(yearMonth.getMonthValue(), yearMonth.getYear())
+                            * getOverlappingDayCount(period, toPeriod(yearMonth))
+                            / yearMonth.lengthOfMonth();
+                }
+
+                result += getMoneyInMonth(period.getEndDate().getMonthValue(), year) * getDayCountBetween(period.getEndDate().withDayOfMonth(1), period.getEndDate()) / period.getEndDate().lengthOfMonth();
             }
             if (!year.equals(period.getStartDate().getYear()) && !year.equals(period.getEndDate().getYear())) {
-                result += getMoneyInYear(1, 12, year);
+                for (Integer month = 1; month <= 12; month++) {
+                    result += getMoneyInMonth(month, year) * getDayCountBetween(LocalDate.of(year, month, 1), LocalDate.of(year, month, YearMonth.of(year, month).lengthOfMonth()))/ YearMonth.of(year, month).lengthOfMonth();
+                }
             }
         }
         return result;
+    }
+
+    private Period toPeriod(YearMonth startMonth) {
+        return new Period(startMonth.atDay(1), startMonth.atEndOfMonth());
+    }
+
+    private int getOverlappingDayCount(Period period, Period another) {
+        LocalDate startOfOverlapping = period.getStartDate().isAfter(another.getStartDate()) ? period.getStartDate() : another.getStartDate();
+        return getDayCountBetween(startOfOverlapping, another.getEndDate());
+    }
+
+    private int getDayCountBetween(LocalDate start, LocalDate end) {
+        return end.getDayOfMonth() - start.getDayOfMonth() + 1;
     }
 
     private Integer getMoneyInMonth(Integer month, Integer year) {
@@ -57,7 +84,7 @@ public class BudgetPlan {
     private Integer getMoneyInYear(int startMonth, int endMonth, Integer year) {
         Integer result = 0;
         for (Integer month = startMonth; month <= endMonth; month++) {
-            result += budgetRepo.getMoney(getMoneyStr(year, month));
+            result += getMoneyInMonth(month, year);
         }
         return result;
     }

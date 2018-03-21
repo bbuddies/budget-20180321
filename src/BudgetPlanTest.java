@@ -58,11 +58,12 @@ public class BudgetPlanTest {
     @Test
     public void query_across_year() throws Exception {
         givenBudgetPeriods(
+                new Budget("2017-11", 30000),
                 new Budget("2017-12", 3100),
                 new Budget("2018-01", 310),
                 new Budget("2018-02", 28)
         );
-        assertEquals(1500 + 310 + 6, budgetPlan.query("2017-12-17", "2018-02-06"), 0.01);
+        assertEquals(14000 + 3100 + 310 + 6, budgetPlan.query("2017-11-17", "2018-02-06"), 0.01);
     }
 
     @Test
