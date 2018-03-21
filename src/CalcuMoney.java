@@ -9,7 +9,7 @@ public class CalcuMoney {
     }
 
     public double calcuMoney(String start, String end){
-//        try {
+        try {
             Integer result = 0;
 
             Integer startDay = Integer.valueOf(start.substring(8, 10));
@@ -50,10 +50,10 @@ public class CalcuMoney {
             }
             return result;
 
-//        }
-//        catch (Exception ex){
-//            return -1;
-//        }
+        }
+        catch (Exception ex){
+            return -1;
+        }
     }
 
     private Integer getMoneyInMonth(Integer month, Integer year) {
