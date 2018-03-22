@@ -1,3 +1,5 @@
+import java.util.List;
+
 public interface BudgetRepo {
-    Integer getMoney(String month);
+    List<Budget> findAll();
 }
